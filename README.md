@@ -2,7 +2,7 @@
 
 TodoFlow is a collaborative todo list application built with modern web technologies. This monorepo contains all components of the TodoFlow platform:
 
-- `packages/api`: Express.js backend API with MongoDB
+- `packages/api`: Express.js backend server with MongoDB
 - `packages/web`: React frontend with Material UI
 - `packages/tests`: Jest-based functional tests
 
@@ -42,11 +42,8 @@ This will start both the API and web frontend in development mode.
 
 ## Commands
 
-- `npm run start` - Start both API and web frontend in production mode
 - `npm run dev` - Start both API and web frontend in development mode
-- `npm run build` - Build all packages
-- `npm run test` - Run tests for all packages
-- `npm run lint` - Run linting for all packages
+- `npm run test` - Run all tests (ensure the server is started first)
 - `npm run type-check` - Run TypeScript type checking for API
 
 ## Project Structure
