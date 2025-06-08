@@ -1,0 +1,36 @@
+{
+  "name": "@todo-app/tests",
+  "version": "1.0.0",
+  "description": "API testing suite for TODO application",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:auth": "jest tests/auth.test.ts",
+    "test:todos": "jest tests/todo.test.ts",
+    "test:lists": "jest tests/todoList.test.ts",    
+    "test:user": "jest tests/user.test.ts",
+    "test:watch": "jest --watchAll"
+  },
+  "keywords": [
+    "api",
+    "testing",
+    "jest",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@todo-app/api": "*",
+    "@types/eventsource": "^3.0.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "eventsource": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.10",
+    "@types/node": "^20.10.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.2"
+  }
+}
