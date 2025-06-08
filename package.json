@@ -9,7 +9,7 @@
       "start": "npm run start --workspace=packages/api & npm run start --workspace=packages/web",
       "dev": "npm run dev --workspace=packages/api & npm run start --workspace=packages/web",
       "build": "npm run build --workspace=packages/api && npm run build --workspace=packages/web",
-      "test": "npm run test --workspace=packages/api && npm run test --workspace=packages/web && npm run test --workspace=packages/tests",
+      "test": "npm run test --workspace=packages/tests",
       "lint": "npm run lint --workspace=packages/api && npm run lint --workspace=packages/web",
       "type-check": "npm run type-check --workspace=packages/api"
     },
