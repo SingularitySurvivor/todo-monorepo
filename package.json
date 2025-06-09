@@ -1,19 +1,25 @@
 {
-    "name": "todo-app-monorepo",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-      "packages/*"
-    ],
-    "scripts": {
-      "start": "npm run start --workspace=packages/api & npm run start --workspace=packages/web",
-      "dev": "npm run dev --workspace=packages/api & npm run start --workspace=packages/web",
-      "build": "npm run build --workspace=packages/api && npm run build --workspace=packages/web",
-      "test": "npm run test --workspace=packages/tests",
-      "lint": "npm run lint --workspace=packages/api && npm run lint --workspace=packages/web",
-      "type-check": "npm run type-check --workspace=packages/api"
-    },
-    "devDependencies": {
-      "concurrently": "^8.2.2"
-    }
+  "name": "todo-app-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace=packages/api & npm run start --workspace=packages/web",
+    "dev": "npm run dev --workspace=packages/api & npm run start --workspace=packages/web",
+    "build": "npm run build --workspace=packages/api && npm run build --workspace=packages/web",
+    "test": "npm run test --workspace=packages/tests",
+    "lint": "npm run lint --workspace=packages/api && npm run lint --workspace=packages/web",
+    "type-check": "npm run type-check --workspace=packages/api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "overrides": {
+    "nth-check": ">=2.0.1",
+    "postcss": ">=8.4.31",
+    "webpack-dev-server": "4.15.1",
+    "svgo": ">=2.0.0"
   }
+}
