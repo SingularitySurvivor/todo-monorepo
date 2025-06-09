@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  todo-app:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    image: todo-app:latest      
+    ports:
+      - "3000:3000"  # Web frontend
+      - "3001:3001"  # API
+      - "27018:27018"  # MongoDB (for debugging, optional)
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://localhost:27018/todoapp
+
+volumes:
+  mongo-data:

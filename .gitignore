@@ -137,4 +137,4 @@ dist
 
 # Deployment artifacts
 combined/
-deployment/
+deployment/images
