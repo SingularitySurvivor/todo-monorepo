@@ -8,9 +8,9 @@ TodoFlow is a collaborative todo list application built with modern web technolo
 
 ## Prerequisites
 
-- Node.js v18+
-- MongoDB
-- npm v9+
+- Node.js v20+
+- npm v10+
+- MongoDB v5+
 
 ## Setup
 
