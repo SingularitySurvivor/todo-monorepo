@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 import { useTodoList } from '../../hooks';
 import { useListTodos } from '../../hooks/useTodos';
-import { useUserGlobalSSE } from '../../hooks/useSSE';
+import { useSSE } from '../../hooks/useSSE';
 import { TodoList, CreateTodoDialog, EditTodoDialog, TodoHeader } from '../../components/todos';
 import { MembersDialog } from '../../components/todo-lists';
 import ConnectionStatus from '../common/ConnectionStatus';
@@ -38,15 +38,28 @@ const TodoListDetailPage: React.FC = () => {
   const { list, loading: listLoading, error: listError, refetch: refetchList } = useTodoList(listId);
   const { todos, loading: todosLoading, error: todosError, refetch: refetchTodos, setFilters } = useListTodos(listId, todoParams);
   
-  // Use user-global SSE connection with event filtering for this list
-  const { getStatus } = useUserGlobalSSE();
   const [createTodoOpen, setCreateTodoOpen] = useState(false);
   const [editTodoOpen, setEditTodoOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   
-  // Get user-global connection status
+  // Use SSE connection with event filtering for this specific list
+  const { getStatus } = useSSE({
+    listId,
+    handlers: {
+      onTodoCreated: () => refetchTodos(),
+      onTodoUpdated: () => refetchTodos(),
+      onTodoDeleted: () => refetchTodos(),
+      onListUpdated: () => refetchList(),
+      onMemberAdded: () => refetchList(),
+      onMemberRemoved: () => refetchList(),
+      onMemberRoleChanged: () => refetchList(),
+    },
+    autoSubscribe: true
+  });
+  
+  // Get connection status
   const connectionStatus = getStatus();
 
   if (!listId) {

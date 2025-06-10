@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { todoAPI } from '../utils/apiClient';
 import { Todo, CreateTodoRequest, UpdateTodoRequest, TodoQueryParams } from '../types/todo';
 import { ApiError } from '../types/auth';
-import { useRealTimeTodos } from './useSSE';
+import { useSSE } from './useSSE';
 
 interface UseTodosState {
   todos: Todo[];
@@ -147,12 +147,15 @@ export const useListTodos = (listId?: string, initialParams?: TodoQueryParams): 
   }, []);
 
   // Set up real-time subscription
-  useRealTimeTodos(
+  useSSE({
     listId,
-    handleTodoCreated,
-    handleTodoUpdated,
-    handleTodoDeleted
-  );
+    handlers: {
+      onTodoCreated: handleTodoCreated,
+      onTodoUpdated: handleTodoUpdated,
+      onTodoDeleted: handleTodoDeleted,
+    },
+    autoSubscribe: true
+  });
 
   const refetch = useCallback(async () => {
     await fetchTodos();

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { todoListAPI } from '../utils/apiClient';
 import { TodoListWithPermissions, CreateTodoListRequest, UpdateTodoListRequest } from '../types/todoList';
 import { ApiError } from '../types/auth';
-import { useRealTimeList } from './useSSE';
+import { useSSE } from './useSSE';
 
 interface UseTodoListState {
   list: TodoListWithPermissions | null;
@@ -93,13 +93,16 @@ export const useTodoList = (listId?: string): UseTodoListReturn => {
   }, []);
 
   // Set up real-time subscription
-  useRealTimeList(
+  useSSE({
     listId,
-    handleListUpdated,
-    handleMemberAdded,
-    handleMemberRemoved,
-    handleMemberRoleChanged
-  );
+    handlers: {
+      onListUpdated: handleListUpdated,
+      onMemberAdded: handleMemberAdded,
+      onMemberRemoved: handleMemberRemoved,
+      onMemberRoleChanged: handleMemberRoleChanged,
+    },
+    autoSubscribe: true
+  });
 
   const updateList = useCallback(async (data: UpdateTodoListRequest) => {
     if (!listId) throw new Error('List ID is required');

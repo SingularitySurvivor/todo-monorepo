@@ -8,7 +8,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTodos } from '../../hooks/useTodos';
-import { useUserGlobalSSE } from '../../hooks/useSSE';
+import { useSSE } from '../../hooks/useSSE';
 import { TodoList, TodoHeader } from '../../components/todos';
 import ConnectionStatus from '../common/ConnectionStatus';
 import { TodoQueryParams, TodoFilters } from '../../types/todo';
@@ -23,19 +23,31 @@ const GlobalTodosPage: React.FC = () => {
 
   const { todos, loading, error, total, refetch, setFilters } = useTodos(todoParams);
 
-  // Real-time event handling - enhance user-global SSE to handle todo events
-  const handleGlobalSSEEvent = useCallback((event: any) => {
-    console.log('Global SSE event received:', event);
-    
-    // Listen for todo events and refresh the global todos
-    if (event.type === 'todo:created' || event.type === 'todo:updated' || event.type === 'todo:deleted') {
-      console.log('Todo event detected, refreshing global todos...');
-      refetch();
-    }
+  // Real-time event handling
+  const handleTodoCreated = useCallback(() => {
+    console.log('Todo created, refreshing global todos...');
+    refetch();
   }, [refetch]);
 
-  // Use the user-global SSE with our todo event handler and get connection status
-  const { getStatus } = useUserGlobalSSE(handleGlobalSSEEvent);
+  const handleTodoUpdated = useCallback(() => {
+    console.log('Todo updated, refreshing global todos...');
+    refetch();
+  }, [refetch]);
+
+  const handleTodoDeleted = useCallback(() => {
+    console.log('Todo deleted, refreshing global todos...');
+    refetch();
+  }, [refetch]);
+
+  // Use the consolidated SSE hook
+  const { getStatus } = useSSE({
+    handlers: {
+      onTodoCreated: handleTodoCreated,
+      onTodoUpdated: handleTodoUpdated,
+      onTodoDeleted: handleTodoDeleted,
+    },
+    autoSubscribe: true
+  });
   const connectionStatus = getStatus();
 
   const handleFiltersChange = (filters: TodoFilters) => {

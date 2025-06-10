@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { todoListAPI } from '../utils/apiClient';
 import { TodoListWithPermissions, ListQueryParams } from '../types/todoList';
 import { ApiError } from '../types/auth';
-import { useRealTimeListsGlobal } from './useSSE';
+import { useSSE } from './useSSE';
 import { useAuth } from '../contexts/AuthContext';
 
 interface UseTodoListsState {
@@ -73,12 +73,15 @@ export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsRetur
   }, []);
 
   // Set up real-time subscription for global list events
-  useRealTimeListsGlobal(
-    handleListShared,
-    handleListRemoved,
-    handleListUpdated,
-    currentUserId
-  );
+  useSSE({
+    currentUserId,
+    handlers: {
+      onListShared: handleListShared,
+      onListRemoved: handleListRemoved,
+      onListUpdated: handleListUpdated,
+    },
+    autoSubscribe: true
+  });
 
   const fetchLists = useCallback(async () => {
     try {
