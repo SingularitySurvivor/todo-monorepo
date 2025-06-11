@@ -128,7 +128,12 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
  * Get current logged in user
  */
 export const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
-  const user = req.user;
+  const userId = req.user?.id;
+  if (!userId) {
+    throw ApiError.unauthorized('User not authenticated');
+  }
+
+  const user = await authService.getUserById(userId);
 
   res.status(200).json({
     status: 'success',

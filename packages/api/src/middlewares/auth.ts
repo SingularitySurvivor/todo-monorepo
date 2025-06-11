@@ -12,47 +12,32 @@ export interface AuthRequest extends Request {
 /**
  * Middleware to authenticate users
  */
-export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     let token;
-    
+
     // Get token from Authorization header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
-    
+
     // For SSE routes, also check query parameter (EventSource can't send custom headers)
     if (!token && req.query.token) {
       token = req.query.token as string;
     }
-    
+
     // Check if token exists
     if (!token) {
       return next(ApiError.unauthorized('Not authorized, no token'));
     }
-    
+
     // Verify token
     try {
       const decoded = jwt.verify(token, config.jwt.secret) as AuthTokenPayload;
-      
-      // Get user from token
-      const user = await User.findById(decoded.id).select('-password');
-      
-      if (!user) {
-        return next(ApiError.unauthorized('User not found'));
-      }
-      
-      if (!user.isActive) {
-        return next(ApiError.unauthorized('User account is deactivated'));
-      }
-      
-      // Attach user to request
-      req.user = user;
-      
-      // Update last login time
-      user.lastLogin = new Date();
-      await user.save({ validateBeforeSave: false });
-      
+
+      // Attach decoded token data to request
+      req.user = decoded;
+
       next();
     } catch (error) {
       return next(ApiError.unauthorized('Not authorized, token failed'));
