@@ -23,7 +23,7 @@ import {
   VpnKey,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import { userAPI } from '../../utils/apiClient';
+import { userAPI, authAPI } from '../../utils/apiClient';
 import { ApiError } from '@todo-app/client-common';
 
 const UserProfilePage: React.FC = () => {
@@ -33,6 +33,8 @@ const UserProfilePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -67,7 +69,7 @@ const UserProfilePage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await userAPI.updateProfile(formData);
+      const response = await authAPI.updateProfile(formData);
       
       // Update the user context with new data
       updateUser(response.data.user);
@@ -88,35 +90,49 @@ const UserProfilePage: React.FC = () => {
   const handlePasswordChange = async () => {
     try {
       setLoading(true);
-      setError(null);
+      setPasswordError(null);
+      setPasswordSuccess(null);
+
+      // Validate current password is provided
+      if (!passwordData.currentPassword) {
+        setPasswordError('Current password is required');
+        return;
+      }
 
       // Validate passwords match
       if (passwordData.newPassword !== passwordData.confirmPassword) {
-        setError('New passwords do not match');
+        setPasswordError('New passwords do not match');
         return;
       }
 
-      // Validate password strength
+      // Validate password strength (more comprehensive)
       if (passwordData.newPassword.length < 8) {
-        setError('Password must be at least 8 characters long');
+        setPasswordError('Password must be at least 8 characters long');
         return;
       }
 
-      await userAPI.updateProfile({ password: passwordData.newPassword });
+      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(passwordData.newPassword)) {
+        setPasswordError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+        return;
+      }
+
+      await authAPI.updatePassword(passwordData.currentPassword, passwordData.newPassword);
       
-      setSuccess('Password updated successfully!');
+      setPasswordSuccess('Password updated successfully!');
       setPasswordDialogOpen(false);
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
+      setPasswordError(null);
       
-      // Clear success message after 3 seconds
+      // Show success message on main screen temporarily
+      setSuccess('Password updated successfully!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message || 'Failed to update password');
+      setPasswordError(apiError.message || 'Failed to update password');
     } finally {
       setLoading(false);
     }
@@ -283,8 +299,9 @@ const UserProfilePage: React.FC = () => {
                 fullWidth
                 variant="outlined"
                 startIcon={<VpnKey />}
-                onClick={() => setPasswordDialogOpen(true)}
+                disabled
                 sx={{ mb: 1 }}
+                title="Password change"
               >
                 Change Password
               </Button>
@@ -298,6 +315,18 @@ const UserProfilePage: React.FC = () => {
         <DialogTitle>Change Password</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
+            {passwordError && (
+              <Alert severity="error" sx={{ mb: 2 }} onClose={() => setPasswordError(null)}>
+                {passwordError}
+              </Alert>
+            )}
+            
+            {passwordSuccess && (
+              <Alert severity="success" sx={{ mb: 2 }} onClose={() => setPasswordSuccess(null)}>
+                {passwordSuccess}
+              </Alert>
+            )}
+            
             <TextField
               fullWidth
               type="password"
@@ -305,6 +334,7 @@ const UserProfilePage: React.FC = () => {
               value={passwordData.currentPassword}
               onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
               margin="normal"
+              required
             />
             <TextField
               fullWidth
@@ -313,7 +343,8 @@ const UserProfilePage: React.FC = () => {
               value={passwordData.newPassword}
               onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
               margin="normal"
-              helperText="Must be at least 8 characters long"
+              required
+              helperText="Must be at least 8 characters with uppercase, lowercase, number, and special character"
             />
             <TextField
               fullWidth
@@ -322,6 +353,7 @@ const UserProfilePage: React.FC = () => {
               value={passwordData.confirmPassword}
               onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
               margin="normal"
+              required
             />
           </Box>
         </DialogContent>

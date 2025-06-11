@@ -23,4 +23,8 @@ export class AuthAPI extends BaseApiClient {
   async updateProfile(userData: any) {
     return this.patch('/auth/me', userData);
   }
+
+  async updatePassword(currentPassword: string, password: string) {
+    return this.patch('/auth/password', { currentPassword, password });
+  }
 }

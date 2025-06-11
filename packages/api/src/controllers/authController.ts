@@ -55,6 +55,20 @@ export const loginValidation = [
 ];
 
 /**
+ * Validation rules for password update
+ */
+export const updatePasswordValidation = [
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('Current password is required'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+];
+
+/**
  * Register a new user
  */
 export const register = asyncHandler(async (req: Request, res: Response) => {
@@ -164,6 +178,33 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     lastName,
     email,
   });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+/**
+ * Update user password
+ */
+export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
+  // Validate request
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw ApiError.validationError(errors.array()[0].msg);
+  }
+
+  const userId = req.user?.id;
+  if (!userId) {
+    throw ApiError.unauthorized('User not authenticated');
+  }
+
+  const { currentPassword, password } = req.body;
+  
+  const updatedUser = await authService.updatePassword(userId, currentPassword, password);
 
   res.status(200).json({
     status: 'success',

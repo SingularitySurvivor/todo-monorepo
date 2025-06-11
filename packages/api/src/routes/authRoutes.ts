@@ -40,4 +40,11 @@ router.get('/me', authenticate, authController.getCurrentUser);
  */
 router.patch('/me', authenticate, authController.updateProfile);
 
+/**
+ * @route   PATCH /api/auth/password
+ * @desc    Update user password
+ * @access  Private
+ */
+router.patch('/password', authenticate, authController.updatePasswordValidation, authController.updatePassword);
+
 export default router;

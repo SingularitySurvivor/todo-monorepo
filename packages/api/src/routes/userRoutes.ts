@@ -21,16 +21,8 @@ router.get('/', isAdmin, userController.getAllUsers);
  */
 router.get('/:id', isAdmin, userController.getUser);
 
-/**
- * @route   PATCH /api/users/me
- * @desc    Update current user
- * @access  Private
- */
-router.patch(
-  '/me',
-  userController.updateUserValidation,
-  userController.updateCurrentUser
-);
+// Removed /me route - moved to auth routes for password updates
+// All user routes are now admin-only
 
 /**
  * @route   PATCH /api/users/:id

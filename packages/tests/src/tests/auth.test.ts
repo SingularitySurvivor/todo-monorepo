@@ -440,6 +440,83 @@ describe('Authentication API', () => {
 
       console.log(`✅ Email uniqueness enforced during profile updates`);
     });
+
+    test('should update user password via auth/password endpoint', async () => {
+      const newPassword = 'NewPassword123!';
+      
+      const response = await ApiClient.patch<ApiResponse<{ user: User }>>('/auth/password', {
+        currentPassword: testUser.password,
+        password: newPassword
+      });
+      
+      expect(response.status).toBe('success');
+      expect(response.data.user).not.toHaveProperty('password'); // Password should not be returned
+      
+      // Verify login works with new password
+      ApiClient.clearAuthToken();
+      const loginUser = await AuthHelper.loginUser({
+        ...testUser,
+        password: newPassword
+      });
+      
+      expect(loginUser.user.id).toBe(testUser.user.id);
+      expect(loginUser.token).toBeDefined();
+      
+      console.log(`✅ Password updated successfully via auth/password endpoint`);
+    });
+
+    test('should validate password strength on password update', async () => {
+      const weakPasswords = [
+        'short',
+        'alllowercase123!',
+        'ALLUPPERCASE123!',
+        'NoNumbers!',
+        'NoSpecialChars123'
+      ];
+
+      for (const weakPassword of weakPasswords) {
+        try {
+          await ApiClient.patch('/auth/password', { 
+            currentPassword: testUser.password,
+            password: weakPassword 
+          });
+          fail(`Expected validation error for weak password: ${weakPassword}`);
+        } catch (error: any) {
+          expect(error.statusCode).toBe(400);
+        }
+      }
+
+      console.log(`✅ Password strength validation working correctly`);
+    });
+
+    test('should reject password update with incorrect current password', async () => {
+      try {
+        await ApiClient.patch('/auth/password', {
+          currentPassword: 'WrongPassword123!',
+          password: 'NewValidPassword123!'
+        });
+        fail('Expected error for incorrect current password');
+      } catch (error: any) {
+        expect(error.statusCode).toBe(401);
+        expect(error.message).toContain('Current password is incorrect');
+      }
+
+      console.log(`✅ Password update correctly rejected with wrong current password`);
+    });
+
+    test('should require current password for password update', async () => {
+      try {
+        await ApiClient.patch('/auth/password', {
+          password: 'NewValidPassword123!'
+        });
+        fail('Expected validation error for missing current password');
+      } catch (error: any) {
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('Current password is required');
+      }
+
+      console.log(`✅ Password update correctly requires current password`);
+    });
   });
 
   describe('Logout and Session Management', () => {

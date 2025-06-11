@@ -151,6 +151,43 @@ export const updateUser = async (
 };
 
 /**
+ * Update user password
+ */
+export const updatePassword = async (
+  userId: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<any> => {
+  try {
+    MongoValidator.validateObjectIds(userId);
+
+    // Find the user with password field
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      throw ApiError.notFound('User not found');
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    if (!isCurrentPasswordValid) {
+      throw ApiError.unauthorized('Current password is incorrect');
+    }
+
+    // Update with new password
+    user.password = newPassword;
+    await user.save();
+
+    // Convert to safe user object
+    const safeUser = UserTransformer.toSafeUser(user);
+
+    return safeUser;
+  } catch (error) {
+    console.error('Error updating password:', error);
+    throw error;
+  }
+};
+
+/**
  * Get user by ID
  */
 export const getUserById = async (userId: string): Promise<any | null> => {
