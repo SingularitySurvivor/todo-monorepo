@@ -5,9 +5,13 @@ import {
   CleanupHelper,
   AssertionHelper,
   AuthenticatedTestUser,
-  ApiClient
+  ApiClient,
+  LoginResponse,
+  RegisterUserPayload,
+  LoginUserPayload,
+  User
 } from '../utils';
-import { LoginResponse, RegisterUserPayload, LoginUserPayload, User, ApiResponse } from '../types';
+import { ApiResponse } from '@todo-app/client-common';
 
 describe('Authentication API', () => {
   let testUser: AuthenticatedTestUser;

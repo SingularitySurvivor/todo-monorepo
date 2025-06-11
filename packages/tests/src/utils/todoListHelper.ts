@@ -1,9 +1,9 @@
-import { ApiClient } from './api';
-import { TodoList, TodoListResponse } from './types';
+import { todoListAPI } from './api';
+import { TodoListWithPermissions as TodoList, ListRole } from '@todo-app/client-common';
 
 export class TodoListHelper {
   static async createTodoList(data: any): Promise<TodoList> {
-    const response = await ApiClient.post<TodoListResponse>('/lists', data);
+    const response = await todoListAPI.createList(data);
     
     if (response.status !== 'success') {
       throw new Error(`Todo list creation failed: ${JSON.stringify(response)}`);
@@ -13,7 +13,7 @@ export class TodoListHelper {
   }
 
   static async getTodoList(listId: string): Promise<TodoList> {
-    const response = await ApiClient.get<TodoListResponse>(`/lists/${listId}`);
+    const response = await todoListAPI.getList(listId);
     
     if (response.status !== 'success') {
       throw new Error(`Failed to get todo list: ${JSON.stringify(response)}`);
@@ -23,7 +23,7 @@ export class TodoListHelper {
   }
 
   static async getTodoLists(): Promise<{ lists: TodoList[], total: number }> {
-    const response = await ApiClient.get('/lists');
+    const response = await todoListAPI.getLists();
     
     if (response.status !== 'success') {
       throw new Error(`Failed to get todo lists: ${JSON.stringify(response)}`);
@@ -33,11 +33,11 @@ export class TodoListHelper {
   }
 
   static async deleteTodoList(listId: string): Promise<void> {
-    await ApiClient.delete(`/lists/${listId}`);
+    await todoListAPI.deleteList(listId);
   }
 
   static async updateTodoList(listId: string, data: any): Promise<TodoList> {
-    const response = await ApiClient.patch<TodoListResponse>(`/lists/${listId}`, data);
+    const response = await todoListAPI.updateList(listId, data);
     
     if (response.status !== 'success') {
       throw new Error(`Failed to update todo list: ${JSON.stringify(response)}`);
@@ -46,39 +46,15 @@ export class TodoListHelper {
     return response.data.list;
   }
 
-  static async addMemberToList(listId: string, email: string, role: 'owner' | 'editor' | 'viewer'): Promise<TodoList> {
-    const response = await ApiClient.post<TodoListResponse>(`/lists/${listId}/members`, {
-      email,
-      role
-    });
-
-    if (response.status !== 'success') {
-      throw new Error(`Failed to add member: ${JSON.stringify(response)}`);
-    }
-
-    return response.data.list;
+  static async addMemberToList(listId: string, email: string, role: ListRole): Promise<void> {
+    await todoListAPI.addMember(listId, { email, role });
   }
 
-  static async removeMemberFromList(listId: string, memberId: string): Promise<TodoList> {
-    const response = await ApiClient.delete<TodoListResponse>(`/lists/${listId}/members/${memberId}`);
-
-    if (response.status !== 'success') {
-      throw new Error(`Failed to remove member: ${JSON.stringify(response)}`);
-    }
-
-    return response.data.list;
+  static async removeMemberFromList(listId: string, memberId: string): Promise<void> {
+    await todoListAPI.removeMember(listId, memberId);
   }
 
-  static async updateMemberRole(listId: string, userId: string, role: 'owner' | 'editor' | 'viewer'): Promise<TodoList> {
-    const response = await ApiClient.patch<TodoListResponse>(`/lists/${listId}/members`, {
-      userId,
-      role
-    });
-
-    if (response.status !== 'success') {
-      throw new Error(`Failed to update member role: ${JSON.stringify(response)}`);
-    }
-
-    return response.data.list;
+  static async updateMemberRole(listId: string, userId: string, role: ListRole): Promise<void> {
+    await todoListAPI.updateMemberRole(listId, { userId, role });
   }
 }

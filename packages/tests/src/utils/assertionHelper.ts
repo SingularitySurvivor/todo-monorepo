@@ -1,4 +1,4 @@
-import { TodoList, Todo, User } from './types';
+import { TodoListWithPermissions as TodoList, Todo, User } from '@todo-app/client-common';
 
 export class AssertionHelper {
   static expectValidTodoList(todoList: TodoList): void {

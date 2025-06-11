@@ -1,5 +1,5 @@
-import { ApiClient } from './api';
-import { TestUser, AuthenticatedTestUser, LoginResponse, RegisterUserPayload } from './types';
+import { authAPI, ApiClient } from './api';
+import { TestUser, AuthenticatedTestUser, RegisterUserPayload } from './types';
 import { TestDataGenerator } from './testDataGenerator';
 
 export class AuthHelper {
@@ -11,7 +11,7 @@ export class AuthHelper {
       lastName: userData.lastName
     };
 
-    const response = await ApiClient.post<LoginResponse>('/auth/register', registerPayload);
+    const response = await authAPI.register(registerPayload);
     
     if (response.status !== 'success') {
       throw new Error(`Registration failed: ${JSON.stringify(response)}`);
@@ -30,7 +30,7 @@ export class AuthHelper {
       password: userData.password
     };
 
-    const response = await ApiClient.post<LoginResponse>('/auth/login', loginPayload);
+    const response = await authAPI.login(loginPayload);
     
     if (response.status !== 'success') {
       throw new Error(`Login failed: ${JSON.stringify(response)}`);

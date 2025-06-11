@@ -14,6 +14,7 @@ import {
   TodoStatsResponse,
   ApiClient
 } from '../utils';
+import { ListRole } from '@todo-app/client-common';
 
 describe('TODO API', () => {
   let primaryUser: AuthenticatedTestUser;
@@ -58,10 +59,10 @@ describe('TODO API', () => {
     );
 
     // Add secondary user as editor to editableList
-    await TodoListHelper.addMemberToList(editableList.id, secondaryUser.email, 'editor');
+    await TodoListHelper.addMemberToList(editableList.id, secondaryUser.email, ListRole.EDITOR);
     
     // Add viewer user as viewer to viewOnlyList
-    await TodoListHelper.addMemberToList(viewOnlyList.id, viewerUser.email, 'viewer');
+    await TodoListHelper.addMemberToList(viewOnlyList.id, viewerUser.email, ListRole.VIEWER);
 
     // Track lists for cleanup
     CleanupHelper.trackTodoList(testList.id);

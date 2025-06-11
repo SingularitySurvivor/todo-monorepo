@@ -11,6 +11,7 @@ import {
   TodoListsResponse,
   ApiClient
 } from '../utils';
+import { ListRole } from '@todo-app/client-common';
 
 describe('Todo List API', () => {
   let primaryUser: AuthenticatedTestUser;
@@ -56,7 +57,7 @@ describe('Todo List API', () => {
       AssertionHelper.expectValidTodoList(response.data.list);
       expect(response.data.list.name).toBe(listData.name);
       expect(response.data.list.description).toBe(listData.description);
-      expect(response.data.list.userRole).toBe('owner');
+      expect(response.data.list.userRole).toBe(ListRole.OWNER);
       expect(response.data.list.canEdit).toBe(true);
       expect(response.data.list.canDelete).toBe(true);
       expect(response.data.list.canManageMembers).toBe(true);
@@ -65,7 +66,7 @@ describe('Todo List API', () => {
       // Verify creator is in members list as owner
       const ownerMember = response.data.list.members.find(m => m.userId === primaryUser.user.id);
       expect(ownerMember).toBeDefined();
-      expect(ownerMember!.role).toBe('owner');
+      expect(ownerMember!.role).toBe(ListRole.OWNER);
 
       CleanupHelper.trackTodoList(response.data.list.id);
       console.log(`✅ Created minimal todo list: ${response.data.list.name}`);
@@ -195,7 +196,7 @@ describe('Todo List API', () => {
     test('should add a member to a todo list', async () => {
       const response = await ApiClient.post<TodoListResponse>(`/lists/${testList.id}/members`, {
         email: secondaryUser.email,
-        role: 'editor'
+        role: ListRole.EDITOR
       });
 
       expect(response.status).toBe('success');
@@ -203,20 +204,20 @@ describe('Todo List API', () => {
 
       const newMember = response.data.list.members.find(m => m.userId === secondaryUser.user.id);
       expect(newMember).toBeDefined();
-      expect(newMember!.role).toBe('editor');
+      expect(newMember!.role).toBe(ListRole.EDITOR);
 
       console.log(`✅ Added member ${secondaryUser.email} as editor`);
     });
 
     test('should not allow adding the same member twice', async () => {
       // Add member first time
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
 
       // Try to add same member again
       try {
         await ApiClient.post(`/lists/${testList.id}/members`, {
           email: secondaryUser.email,
-          role: 'viewer'
+          role: ListRole.VIEWER
         });
         fail('Expected error when adding duplicate member');
       } catch (error: any) {
@@ -229,24 +230,24 @@ describe('Todo List API', () => {
 
     test('should update a member role', async () => {
       // Add member as editor
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
 
       // Update role to viewer
       const response = await ApiClient.patch<TodoListResponse>(`/lists/${testList.id}/members`, {
         userId: secondaryUser.user.id,
-        role: 'viewer'
+        role: ListRole.VIEWER
       });
 
       expect(response.status).toBe('success');
       const updatedMember = response.data.list.members.find(m => m.userId === secondaryUser.user.id);
-      expect(updatedMember!.role).toBe('viewer');
+      expect(updatedMember!.role).toBe(ListRole.VIEWER);
 
       console.log(`✅ Updated member role from editor to viewer`);
     });
 
     test('should remove a member from a todo list', async () => {
       // Add member first
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
 
       // Remove member
       const response = await ApiClient.delete<TodoListResponse>(`/lists/${testList.id}/members/${secondaryUser.user.id}`);
@@ -272,7 +273,7 @@ describe('Todo List API', () => {
 
     test('should allow member to leave a list', async () => {
       // Add secondary user as member
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
 
       // Switch to secondary user
       AuthHelper.setAuthToken(secondaryUser.token);
@@ -314,14 +315,14 @@ describe('Todo List API', () => {
       CleanupHelper.trackTodoList(testList.id);
 
       // Add secondary user as editor and viewer user as viewer
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
-      await TodoListHelper.addMemberToList(testList.id, viewerUser.email, 'viewer');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
+      await TodoListHelper.addMemberToList(testList.id, viewerUser.email, ListRole.VIEWER);
     });
 
     test('owner should have all permissions', async () => {
       const response = await ApiClient.get<TodoListResponse>(`/lists/${testList.id}`);
       
-      expect(response.data.list.userRole).toBe('owner');
+      expect(response.data.list.userRole).toBe(ListRole.OWNER);
       expect(response.data.list.canEdit).toBe(true);
       expect(response.data.list.canDelete).toBe(true);
       expect(response.data.list.canManageMembers).toBe(true);
@@ -334,7 +335,7 @@ describe('Todo List API', () => {
       
       const response = await ApiClient.get<TodoListResponse>(`/lists/${testList.id}`);
       
-      expect(response.data.list.userRole).toBe('editor');
+      expect(response.data.list.userRole).toBe(ListRole.EDITOR);
       expect(response.data.list.canEdit).toBe(true);
       expect(response.data.list.canDelete).toBe(false);
       expect(response.data.list.canManageMembers).toBe(false);
@@ -347,7 +348,7 @@ describe('Todo List API', () => {
       
       const response = await ApiClient.get<TodoListResponse>(`/lists/${testList.id}`);
       
-      expect(response.data.list.userRole).toBe('viewer');
+      expect(response.data.list.userRole).toBe(ListRole.VIEWER);
       expect(response.data.list.canEdit).toBe(false);
       expect(response.data.list.canDelete).toBe(false);
       expect(response.data.list.canManageMembers).toBe(false);
@@ -361,7 +362,7 @@ describe('Todo List API', () => {
       try {
         await ApiClient.post(`/lists/${testList.id}/members`, {
           email: 'newuser@example.com',
-          role: 'viewer'
+          role: ListRole.VIEWER
         });
         fail('Expected permission error');
       } catch (error: any) {
@@ -417,7 +418,7 @@ describe('Todo List API', () => {
       );
       CleanupHelper.trackTodoList(testList.id);
 
-      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, 'editor');
+      await TodoListHelper.addMemberToList(testList.id, secondaryUser.email, ListRole.EDITOR);
 
       // Switch to secondary user and filter by role
       AuthHelper.setAuthToken(secondaryUser.token);
@@ -425,7 +426,7 @@ describe('Todo List API', () => {
 
       expect(response.status).toBe('success');
       response.data.lists.forEach(list => {
-        expect(list.userRole).toBe('editor');
+        expect(list.userRole).toBe(ListRole.EDITOR);
       });
 
       console.log(`✅ Filtered lists by role: found ${response.data.lists.length} lists where user is editor`);
@@ -529,7 +530,7 @@ describe('Todo List API', () => {
       try {
         await ApiClient.post(`/lists/${testList.id}/members`, {
           email: 'invalid-email',
-          role: 'editor'
+          role: ListRole.EDITOR
         });
         fail('Expected validation error for invalid email');
       } catch (error: any) {
@@ -548,7 +549,7 @@ describe('Todo List API', () => {
       try {
         await ApiClient.post(`/lists/${testList.id}/members`, {
           email: 'nonexistent@example.com',
-          role: 'editor'
+          role: ListRole.EDITOR
         });
         fail('Expected error for non-existent user');
       } catch (error: any) {

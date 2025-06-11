@@ -1,9 +1,9 @@
-import { ApiClient } from './api';
-import { Todo, TodoResponse } from './types';
+import { todoAPI } from './api';
+import { Todo } from '@todo-app/client-common';
 
 export class TodoHelper {
   static async createTodo(data: any): Promise<Todo> {
-    const response = await ApiClient.post<TodoResponse>('/todos', data);
+    const response = await todoAPI.createTodo(data);
     
     if (response.status !== 'success') {
       throw new Error(`Todo creation failed: ${JSON.stringify(response)}`);
@@ -13,7 +13,7 @@ export class TodoHelper {
   }
 
   static async getTodo(todoId: string): Promise<Todo> {
-    const response = await ApiClient.get<TodoResponse>(`/todos/${todoId}`);
+    const response = await todoAPI.getTodo(todoId);
     
     if (response.status !== 'success') {
       throw new Error(`Failed to get todo: ${JSON.stringify(response)}`);
@@ -23,7 +23,7 @@ export class TodoHelper {
   }
 
   static async updateTodo(todoId: string, data: any): Promise<Todo> {
-    const response = await ApiClient.patch<TodoResponse>(`/todos/${todoId}`, data);
+    const response = await todoAPI.updateTodo(todoId, data);
     
     if (response.status !== 'success') {
       throw new Error(`Failed to update todo: ${JSON.stringify(response)}`);
@@ -33,6 +33,6 @@ export class TodoHelper {
   }
 
   static async deleteTodo(todoId: string): Promise<void> {
-    await ApiClient.delete(`/todos/${todoId}`);
+    await todoAPI.deleteTodo(todoId);
   }
 }
