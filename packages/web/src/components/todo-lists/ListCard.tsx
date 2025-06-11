@@ -22,7 +22,7 @@ import {
   People,
   Lock,
 } from '@mui/icons-material';
-import { TodoListWithPermissions, ListRole } from '../../types/todoList';
+import { TodoListWithPermissions, ListRole } from '@todo-app/client-common';
 
 interface ListCardProps {
   list: TodoListWithPermissions;

@@ -11,7 +11,7 @@ import { useTodos } from '../../hooks/useTodos';
 import { useSSE } from '../../hooks/useSSE';
 import { TodoList, TodoHeader } from '../../components/todos';
 import ConnectionStatus from '../common/ConnectionStatus';
-import { TodoQueryParams, TodoFilters } from '../../types/todo';
+import { TodoQueryParams, TodoFilters } from '@todo-app/client-common';
 
 const GlobalTodosPage: React.FC = () => {
   const [todoParams, setTodoParams] = useState<TodoQueryParams>({

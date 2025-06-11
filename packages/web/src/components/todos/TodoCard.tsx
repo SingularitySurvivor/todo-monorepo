@@ -20,7 +20,7 @@ import {
   Schedule,
   Flag,
 } from '@mui/icons-material';
-import { Todo, TodoStatus, TodoPriority } from '../../types/todo';
+import { Todo, TodoStatus, TodoPriority } from '@todo-app/client-common';
 
 interface TodoCardProps {
   todo: Todo;
@@ -68,7 +68,8 @@ const TodoCard: React.FC<TodoCardProps> = ({
     onClick?.(todo);
   };
 
-  const getPriorityColor = (priority: TodoPriority) => {
+  const getPriorityColor = (priority?: TodoPriority) => {
+    if (!priority) return 'default';
     switch (priority) {
       case TodoPriority.HIGH:
         return 'error';
@@ -182,13 +183,15 @@ const TodoCard: React.FC<TodoCardProps> = ({
                 variant="outlined"
               />
               
-              <Chip
-                label={todo.priority}
-                size="small"
-                color={getPriorityColor(todo.priority)}
-                variant="filled"
-                icon={<Flag />}
-              />
+              {todo.priority && (
+                <Chip
+                  label={todo.priority}
+                  size="small"
+                  color={getPriorityColor(todo.priority)}
+                  variant="filled"
+                  icon={<Flag />}
+                />
+              )}
 
               {dueDateInfo && (
                 <Chip

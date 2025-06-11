@@ -174,7 +174,7 @@ describe('Todo List API', () => {
         await ApiClient.get(`/lists/${createdList.id}`);
         fail('Expected list to be deleted');
       } catch (error: any) {
-        expect(error.response?.status).toBe(404);
+        expect(error.statusCode).toBe(404);
       }
 
       console.log(`✅ Deleted todo list: List to Delete`);
@@ -220,8 +220,8 @@ describe('Todo List API', () => {
         });
         fail('Expected error when adding duplicate member');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('already a member');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('already a member');
       }
 
       console.log(`✅ Correctly prevented duplicate member addition`);
@@ -263,8 +263,8 @@ describe('Todo List API', () => {
         await ApiClient.delete(`/lists/${testList.id}/members/${primaryUser.user.id}`);
         fail('Expected error when removing creator');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('creator');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('creator');
       }
 
       console.log(`✅ Correctly prevented creator removal`);
@@ -295,8 +295,8 @@ describe('Todo List API', () => {
         await ApiClient.post(`/lists/${testList.id}/leave`);
         fail('Expected error when only owner tries to leave');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('only owner');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('only owner');
       }
 
       console.log(`✅ Correctly prevented only owner from leaving`);
@@ -365,7 +365,7 @@ describe('Todo List API', () => {
         });
         fail('Expected permission error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Editor correctly denied member management`);
@@ -380,7 +380,7 @@ describe('Todo List API', () => {
         });
         fail('Expected permission error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Viewer correctly denied edit permissions`);
@@ -397,7 +397,7 @@ describe('Todo List API', () => {
         await ApiClient.get(`/lists/${testList.id}`);
         fail('Expected access denied error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Non-member correctly denied access`);
@@ -497,8 +497,8 @@ describe('Todo List API', () => {
         await ApiClient.post('/lists', listData);
         fail('Expected validation error for missing name');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('name');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('name');
       }
 
       console.log(`✅ Validation correctly rejected list without name`);
@@ -514,7 +514,7 @@ describe('Todo List API', () => {
         await ApiClient.post('/lists', listData);
         fail('Expected validation error for invalid color');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
       }
 
       console.log(`✅ Validation correctly rejected list with invalid color`);
@@ -533,7 +533,7 @@ describe('Todo List API', () => {
         });
         fail('Expected validation error for invalid email');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
       }
 
       console.log(`✅ Validation correctly rejected invalid email`);
@@ -552,7 +552,7 @@ describe('Todo List API', () => {
         });
         fail('Expected error for non-existent user');
       } catch (error: any) {
-        expect(error.response?.status).toBe(404);
+        expect(error.statusCode).toBe(404);
       }
 
       console.log(`✅ Correctly rejected non-existent user email`);
@@ -567,7 +567,7 @@ describe('Todo List API', () => {
         await ApiClient.get('/lists');
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Security check passed: unauthenticated access denied`);
@@ -581,7 +581,7 @@ describe('Todo List API', () => {
         await ApiClient.get(`/lists/${nonExistentId}`);
         fail('Expected list not found error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(404);
+        expect(error.statusCode).toBe(404);
       }
 
       console.log(`✅ Security check passed: cannot access non-existent lists`);

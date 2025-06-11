@@ -35,7 +35,7 @@ import {
   Edit,
   Visibility,
 } from '@mui/icons-material';
-import { TodoListWithPermissions, ListRole, AddMemberRequest, UpdateMemberRoleRequest } from '../../types/todoList';
+import { TodoListWithPermissions, ListRole, AddMemberRequest, UpdateMemberRoleRequest } from '@todo-app/client-common';
 import { useListPermissions } from '../../hooks';
 
 interface MembersDialogProps {

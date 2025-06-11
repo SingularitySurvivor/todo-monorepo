@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { todoAPI } from '../utils/apiClient';
-import { TodoStats } from '../types/todo';
-import { ApiError } from '../types/auth';
+import { TodoStats, ApiError } from '@todo-app/client-common';
 
 interface UseTodoStatsReturn {
   stats: TodoStats | null;

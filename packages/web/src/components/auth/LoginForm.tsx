@@ -15,7 +15,7 @@ import {
   Stack,
 } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
-import { LoginRequest, ApiError } from "../../types/auth";
+import { LoginRequest, ApiError } from "@todo-app/client-common";
 
 const validationSchema = yup.object({
   email: yup

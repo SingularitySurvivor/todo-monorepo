@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTodoLists } from '../../hooks';
 import { useSSE } from '../../hooks/useSSE';
 import { ListHeader, ListGrid, CreateListDialog, EditListDialog, MembersDialog } from '../../components/todo-lists';
-import { ListQueryParams, TodoListWithPermissions } from '../../types/todoList';
+import { ListQueryParams, TodoListWithPermissions } from '@todo-app/client-common';
 import { todoListAPI } from '../../utils/apiClient';
 
 const TodoListsPage: React.FC = () => {

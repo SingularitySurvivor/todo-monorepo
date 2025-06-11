@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthContextType, LoginRequest, RegisterRequest } from '../types/auth';
+import { User, AuthContextType, LoginRequest, RegisterRequest } from '@todo-app/client-common';
 import { authAPI, userAPI } from '../utils/apiClient';
+import apiClient from '../utils/apiClient';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -25,6 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (storedToken && storedUser) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+          apiClient.setAuthToken(storedToken);
           
           // Verify token is still valid by fetching profile
           try {
@@ -34,10 +36,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             // Token is invalid, clear auth state
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
             setToken(null);
             setUser(null);
+            apiClient.clearAuthToken();
           }
         }
       } catch (error) {
@@ -62,9 +63,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(newUser);
         setToken(newToken);
         
-        // Persist to localStorage
+        // Persist to localStorage and update API clients
         localStorage.setItem('authToken', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
+        apiClient.setAuthToken(newToken);
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -86,9 +88,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(newUser);
         setToken(newToken);
         
-        // Persist to localStorage
+        // Persist to localStorage and update API clients
         localStorage.setItem('authToken', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
+        apiClient.setAuthToken(newToken);
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -101,8 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = (): void => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    apiClient.clearAuthToken();
   };
 
   const updateProfile = async (userData: Partial<User>): Promise<void> => {

@@ -17,7 +17,7 @@ import {
   Clear,
   Sort,
 } from '@mui/icons-material';
-import { TodoStatus, TodoPriority, TodoFilters } from '../../types/todo';
+import { TodoStatus, TodoPriority, TodoFilters } from '@todo-app/client-common';
 
 interface TodoHeaderProps {
   title?: string;

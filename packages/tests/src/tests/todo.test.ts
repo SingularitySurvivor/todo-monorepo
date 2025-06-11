@@ -236,7 +236,7 @@ describe('TODO API', () => {
         await ApiClient.get(`/todos/${createdTodo.id}`);
         fail('Expected todo to be deleted');
       } catch (error: any) {
-        expect(error.response?.status).toBe(404);
+        expect(error.statusCode).toBe(404);
       }
 
       console.log(`✅ Deleted todo: Todo to Delete`);
@@ -273,7 +273,7 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected permission error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Viewer correctly denied todo creation in view-only list`);
@@ -291,7 +291,7 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected permission error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Non-member correctly denied todo creation`);
@@ -318,7 +318,7 @@ describe('TODO API', () => {
         await ApiClient.patch(`/todos/${createdTodo.id}`, { name: 'Unauthorized Update' });
         fail('Expected permission error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Viewer can read but cannot edit todos`);
@@ -561,8 +561,8 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected validation error for missing name');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('name');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('name');
       }
 
       console.log(`✅ Validation correctly rejected todo without name`);
@@ -578,8 +578,8 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected validation error for missing listId');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('list');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('list');
       }
 
       console.log(`✅ Validation correctly rejected todo without listId`);
@@ -598,8 +598,8 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected validation error for past due date');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('future');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('future');
       }
 
       console.log(`✅ Validation correctly rejected todo with past due date`);
@@ -616,7 +616,7 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected validation error for invalid status');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
       }
 
       console.log(`✅ Validation correctly rejected todo with invalid status`);
@@ -633,7 +633,7 @@ describe('TODO API', () => {
         await ApiClient.post('/todos', todoData);
         fail('Expected validation error for invalid priority');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
       }
 
       console.log(`✅ Validation correctly rejected todo with invalid priority`);
@@ -648,7 +648,7 @@ describe('TODO API', () => {
         await ApiClient.get('/todos');
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Security check passed: unauthenticated access denied`);
@@ -662,7 +662,7 @@ describe('TODO API', () => {
         await ApiClient.get(`/todos/${nonExistentId}`);
         fail('Expected todo not found error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(404);
+        expect(error.statusCode).toBe(404);
       }
 
       console.log(`✅ Security check passed: cannot access non-existent todos`);
@@ -682,7 +682,7 @@ describe('TODO API', () => {
         await ApiClient.get(`/todos/${createdTodo.id}`);
         fail('Expected access denied error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(403);
+        expect(error.statusCode).toBe(403);
       }
 
       console.log(`✅ Security check passed: cannot access todos from inaccessible lists`);

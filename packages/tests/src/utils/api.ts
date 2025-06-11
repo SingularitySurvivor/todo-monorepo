@@ -1,135 +1,61 @@
 // test/utils/api.ts
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
+import { createApiClients } from '@todo-app/client-common';
 
 // Load environment variables
 dotenv.config();
 
-// Add state for token storage
-let authToken: string | null = null;
+// Create API clients with test environment configuration
+const apiClients = createApiClients(process.env.API_BASE_URL || 'http://localhost:3000/api');
 
-// Create axios instance with base configuration
-const api = axios.create({
-  baseURL: process.env.API_BASE_URL || 'http://localhost:3000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Export the API clients for use in tests
+export const { auth: authAPI, todoList: todoListAPI, todo: todoAPI, user: userAPI } = apiClients;
 
-// Add request interceptor to include auth token when available
-api.interceptors.request.use(
-  (config) => {
-    if (authToken && config.headers) {
-      config.headers.Authorization = `Bearer ${authToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor for consistent error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Enhance error with response data for better debugging
-    if (error.response) {
-      error.message = error.response.data?.message || error.message;
-    }
-    return Promise.reject(error);
-  }
-);
-
+// Export the client management functions
 export const ApiClient = {
-  /**
-   * Set base URL for requests
-   */
-  setBaseURL(url: string): void {
-    api.defaults.baseURL = url;
+  setBaseURL: (url: string) => {
+    // Note: This would require updating the base client implementation
+    // For now, create new clients with the new base URL
+    const newClients = createApiClients(url);
+    Object.assign(apiClients, newClients);
+  },
+  
+  setAuthToken: (token: string) => {
+    authAPI.setAuthToken(token);
+    todoListAPI.setAuthToken(token);
+    todoAPI.setAuthToken(token);
+    userAPI.setAuthToken(token);
+  },
+  
+  getAuthToken: () => {
+    return authAPI.getAuthToken();
+  },
+  
+  clearAuthToken: () => {
+    authAPI.clearAuthToken();
+    todoListAPI.clearAuthToken();
+    todoAPI.clearAuthToken();
+    userAPI.clearAuthToken();
   },
 
-  /**
-   * Set authentication token for future requests
-   */
-  setAuthToken(token: string): void {
-    authToken = token;
+  // Legacy HTTP methods for backward compatibility
+  get: <T = any>(url: string, config?: any): Promise<T> => {
+    return authAPI.get<T>(url, config);
   },
-
-  /**
-   * Get current authentication token
-   */
-  getAuthToken(): string | null {
-    return authToken;
+  
+  post: <T = any>(url: string, data: any = {}, config?: any): Promise<T> => {
+    return authAPI.post<T>(url, data, config);
   },
-
-  /**
-   * Clear authentication token
-   */
-  clearAuthToken(): void {
-    authToken = null;
+  
+  put: <T = any>(url: string, data: any = {}, config?: any): Promise<T> => {
+    return authAPI.put<T>(url, data, config);
   },
-
-  /**
-   * Make a GET request
-   */
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await api.get(url, config);
-      return response.data;
-    } catch (error: any) {
-      console.error(`GET request failed: ${url}`, error.response?.data || error.message);
-      throw error;
-    }
+  
+  patch: <T = any>(url: string, data: any = {}, config?: any): Promise<T> => {
+    return authAPI.patch<T>(url, data, config);
   },
-
-  /**
-   * Make a POST request
-   */
-  async post<T = any>(url: string, data: any = {}, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await api.post(url, data, config);
-      return response.data;
-    } catch (error: any) {
-      console.error(`POST request failed: ${url}`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  /**
-   * Make a PUT request
-   */
-  async put<T = any>(url: string, data: any = {}, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await api.put(url, data, config);
-      return response.data;
-    } catch (error: any) {
-      console.error(`PUT request failed: ${url}`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  /**
-   * Make a PATCH request
-   */
-  async patch<T = any>(url: string, data: any = {}, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await api.patch(url, data, config);
-      return response.data;
-    } catch (error: any) {
-      console.error(`PATCH request failed: ${url}`, error.response?.data || error.message);
-      throw error;
-    }
-  },
-
-  /**
-   * Make a DELETE request
-   */
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await api.delete(url, config);
-      return response.data;
-    } catch (error: any) {
-      console.error(`DELETE request failed: ${url}`, error.response?.data || error.message);
-      throw error;
-    }
+  
+  delete: <T = any>(url: string, config?: any): Promise<T> => {
+    return authAPI.delete<T>(url, config);
   },
 };

@@ -2,6 +2,7 @@
   "name": "@todo-app/tests",
   "version": "1.0.0",
   "description": "API testing suite for TODO application",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -21,8 +22,8 @@
   "license": "MIT",
   "dependencies": {
     "@todo-app/api": "*",
+    "@todo-app/client-common": "*",
     "@types/eventsource": "^3.0.0",
-    "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "eventsource": "^4.0.0"
   },

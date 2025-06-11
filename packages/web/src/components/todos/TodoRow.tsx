@@ -20,7 +20,7 @@ import {
   Schedule,
   Flag,
 } from '@mui/icons-material';
-import { Todo, TodoStatus, TodoPriority, User } from '../../types/todo';
+import { Todo, TodoStatus, TodoPriority, User } from '@todo-app/client-common';
 
 interface TodoRowProps {
   todo: Todo;
@@ -72,7 +72,8 @@ const TodoRow: React.FC<TodoRowProps> = ({
     onClick?.(todo);
   };
 
-  const getPriorityColor = (priority: TodoPriority) => {
+  const getPriorityColor = (priority?: TodoPriority) => {
+    if (!priority) return '#e0e0e0';
     switch (priority) {
       case TodoPriority.HIGH:
         return '#f44336';

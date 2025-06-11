@@ -73,8 +73,8 @@ describe('Authentication API', () => {
         await ApiClient.post('/auth/register', registerPayload);
         fail('Expected duplicate email error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
-        expect(error.response?.data?.message).toContain('email');
+        expect(error.statusCode).toBe(400);
+        expect(error.message).toContain('email');
       }
 
       console.log(`✅ Duplicate email registration correctly rejected`);
@@ -93,7 +93,7 @@ describe('Authentication API', () => {
           await ApiClient.post('/auth/register', testCase.payload);
           fail(`Expected validation error for missing ${testCase.field}`);
         } catch (error: any) {
-          expect(error.response?.status).toBe(400);
+          expect(error.statusCode).toBe(400);
         }
       }
 
@@ -113,7 +113,7 @@ describe('Authentication API', () => {
           });
           fail(`Expected validation error for invalid email: ${email}`);
         } catch (error: any) {
-          expect(error.response?.status).toBe(400);
+          expect(error.statusCode).toBe(400);
         }
       }
 
@@ -133,7 +133,7 @@ describe('Authentication API', () => {
           });
           fail(`Expected validation error for weak password: ${password}`);
         } catch (error: any) {
-          expect(error.response?.status).toBe(400);
+          expect(error.statusCode).toBe(400);
         }
       }
 
@@ -185,7 +185,7 @@ describe('Authentication API', () => {
         await ApiClient.post('/auth/login', loginPayload);
         fail('Expected login error for wrong password');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Login correctly rejected with wrong password`);
@@ -201,7 +201,7 @@ describe('Authentication API', () => {
         await ApiClient.post('/auth/login', loginPayload);
         fail('Expected login error for non-existent user');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Login correctly rejected for non-existent user`);
@@ -251,7 +251,7 @@ describe('Authentication API', () => {
         await ApiClient.get('/auth/me');
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Protected route correctly rejected without token`);
@@ -264,7 +264,7 @@ describe('Authentication API', () => {
         await ApiClient.get('/auth/me');
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Protected route correctly rejected with invalid token`);
@@ -280,7 +280,7 @@ describe('Authentication API', () => {
         await ApiClient.get('/auth/me');
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Protected route correctly rejected with expired token`);
@@ -329,21 +329,21 @@ describe('Authentication API', () => {
         ApiClient.post('/auth/login', {
           email: userData.email,
           password: 'WrongPassword123!'
-        }).catch(error => error.response)
+        }).catch(error => error)
       );
 
       const responses = await Promise.all(failedAttempts);
       
       // Most should be 401 (wrong password), but some might be 429 (rate limited)
       const rateLimitedResponses = responses.filter(response => 
-        response && typeof response === 'object' && 'status' in response && response.status === 429
+        response && typeof response === 'object' && 'statusCode' in response && response.statusCode === 429
       );
       
       // Note: This test might not trigger rate limiting in a test environment
       // The important thing is that we don't get any unexpected errors
       responses.forEach(response => {
-        if (response && typeof response === 'object' && 'status' in response) {
-          expect([401, 429]).toContain(response.status);
+        if (response && typeof response === 'object' && 'statusCode' in response) {
+          expect([401, 429]).toContain(response.statusCode);
         }
       });
 
@@ -379,7 +379,7 @@ describe('Authentication API', () => {
         console.log(`✅ Input sanitization working correctly`);
       } catch (error: any) {
         // If registration fails due to validation, that's also acceptable
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
         console.log(`✅ Malicious input correctly rejected during validation`);
       }
     });
@@ -431,7 +431,7 @@ describe('Authentication API', () => {
         });
         fail('Expected error when updating to existing email');
       } catch (error: any) {
-        expect(error.response?.status).toBe(400);
+        expect(error.statusCode).toBe(400);
       }
 
       console.log(`✅ Email uniqueness enforced during profile updates`);
@@ -462,7 +462,7 @@ describe('Authentication API', () => {
         await ApiClient.get('/auth/me');
         fail('Expected authentication error after logout');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ Logout completed successfully`);
@@ -476,7 +476,7 @@ describe('Authentication API', () => {
         // Logout might succeed even when not authenticated (idempotent)
         // Or it might require authentication - both are valid approaches
       } catch (error: any) {
-        expect([401, 200].includes(error.response?.status)).toBe(true);
+        expect([401, 200].includes(error.statusCode)).toBe(true);
       }
 
       console.log(`✅ Logout handled correctly when not authenticated`);

@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { userAPI } from '../../utils/apiClient';
-import { ApiError } from '../../types/auth';
+import { ApiError } from '@todo-app/client-common';
 
 const UserProfilePage: React.FC = () => {
   const { user, updateUser } = useAuth();

@@ -125,7 +125,7 @@ describe('User API', () => {
           await ApiClient.patch('/users/me', invalidUpdate);
           fail(`Expected validation error for update: ${JSON.stringify(invalidUpdate)}`);
         } catch (error: any) {
-          expect(error.response?.status).toBe(400);
+          expect(error.statusCode).toBe(400);
         }
       }
 
@@ -158,7 +158,7 @@ describe('User API', () => {
         await ApiClient.patch('/users/me', { firstName: 'Test' });
         fail('Expected authentication error');
       } catch (error: any) {
-        expect(error.response?.status).toBe(401);
+        expect(error.statusCode).toBe(401);
       }
 
       console.log(`✅ users/me endpoint correctly requires authentication`);
@@ -183,7 +183,7 @@ describe('User API', () => {
           }
           fail(`Expected forbidden error for ${endpoint.method} ${endpoint.url}`);
         } catch (error: any) {
-          expect([401, 403]).toContain(error.response?.status);
+          expect([401, 403]).toContain(error.statusCode);
         }
       }
 
@@ -210,7 +210,7 @@ describe('User API', () => {
             await ApiClient.patch('/users/me', data);
             fail(`Expected validation error for: ${JSON.stringify(data)}`);
           } catch (error: any) {
-            expect(error.response?.status).toBe(400);
+            expect(error.statusCode).toBe(400);
           }
         } else {
           // Unknown fields should be ignored, not cause errors

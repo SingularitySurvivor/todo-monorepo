@@ -1,5 +1,5 @@
 import React from "react";
-import { Todo, UpdateTodoRequest } from "../../types/todo";
+import { Todo, UpdateTodoRequest } from "@todo-app/client-common";
 import TodoDialog from "./TodoDialog";
 
 interface EditTodoDialogProps {

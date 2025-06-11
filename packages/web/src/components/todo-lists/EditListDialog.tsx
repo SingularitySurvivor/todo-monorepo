@@ -1,5 +1,5 @@
 import React from 'react';
-import { TodoListWithPermissions } from '../../types/todoList';
+import { TodoListWithPermissions } from '@todo-app/client-common';
 import ListDialog from './ListDialog';
 
 interface EditListDialogProps {

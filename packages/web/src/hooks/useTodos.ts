@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { todoAPI } from '../utils/apiClient';
-import { Todo, CreateTodoRequest, UpdateTodoRequest, TodoQueryParams } from '../types/todo';
-import { ApiError } from '../types/auth';
+import { Todo, CreateTodoRequest, UpdateTodoRequest, TodoQueryParams, ApiError } from '@todo-app/client-common';
 import { useSSE } from './useSSE';
 
 interface UseTodosState {

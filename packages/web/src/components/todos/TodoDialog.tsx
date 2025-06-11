@@ -24,7 +24,7 @@ import {
   UpdateTodoRequest,
   TodoStatus,
   TodoPriority,
-} from "../../types/todo";
+} from "@todo-app/client-common";
 import { useCreateTodo } from "../../hooks/useTodos";
 
 interface TodoDialogProps {
@@ -84,7 +84,7 @@ const TodoDialog: React.FC<TodoDialogProps> = ({
         name: todo.name,
         description: todo.description || "",
         status: todo.status,
-        priority: todo.priority,
+        priority: todo.priority || TodoPriority.LOW,
         dueDate: todo.dueDate ? todo.dueDate.slice(0, 16) : "", // Format for datetime-local input
       });
     } else if (!isEditMode) {

@@ -16,7 +16,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
-import { RegisterRequest, ApiError } from "../../types/auth";
+import { RegisterRequest, ApiError } from "@todo-app/client-common";
 
 const validationSchema = yup.object({
   firstName: yup

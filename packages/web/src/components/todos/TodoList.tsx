@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import { Todo, TodoStatus } from '../../types/todo';
+import { Todo, TodoStatus } from '@todo-app/client-common';
 import TodoCard from './TodoCard';
 import TodoRow from './TodoRow';
 

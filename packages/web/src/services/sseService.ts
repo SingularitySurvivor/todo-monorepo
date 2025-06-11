@@ -1,4 +1,5 @@
-import apiClient from '../utils/apiClient';
+// Since we no longer have a direct axios client, we'll need to construct the base URL differently
+// For now, use the environment variable directly
 
 export interface SSEEvent {
   type: 'todo:created' | 'todo:updated' | 'todo:deleted' | 'list:updated' | 'list:deleted' | 'member:added' | 'member:removed' | 'member:role_changed' | 'ping';
@@ -37,7 +38,7 @@ class SSEService {
       }
 
       // Create EventSource with auth header (via query param since EventSource doesn't support headers)
-      const baseURL = apiClient.defaults.baseURL || 'http://localhost:3001/api';
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
       const url = `${baseURL}/sse/lists/${listId}?token=${encodeURIComponent(token)}`;
       const eventSource = new EventSource(url);
 
@@ -105,7 +106,7 @@ class SSEService {
       }
 
       // Create EventSource for user-global events
-      const baseURL = apiClient.defaults.baseURL || 'http://localhost:3001/api';
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
       const url = `${baseURL}/sse/user?token=${encodeURIComponent(token)}`;
       const eventSource = new EventSource(url);
 

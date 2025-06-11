@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { todoListAPI } from '../utils/apiClient';
-import { AddMemberRequest, UpdateMemberRoleRequest } from '../types/todoList';
-import { ApiError } from '../types/auth';
+import { AddMemberRequest, UpdateMemberRoleRequest, ApiError } from '@todo-app/client-common';
 
 interface UseListPermissionsState {
   loading: boolean;

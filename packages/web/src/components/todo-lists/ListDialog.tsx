@@ -22,7 +22,7 @@ import {
   CreateTodoListRequest, 
   UpdateTodoListRequest, 
   TodoListWithPermissions 
-} from '../../types/todoList';
+} from '@todo-app/client-common';
 import { useCreateTodoList } from '../../hooks/useTodoList';
 import { todoListAPI } from '../../utils/apiClient';
 

@@ -19,7 +19,7 @@ import {
   FilterList,
   Clear,
 } from '@mui/icons-material';
-import { ListRole, ListFilters } from '../../types/todoList';
+import { ListRole, ListFilters } from '@todo-app/client-common';
 import ConnectionStatus from '../common/ConnectionStatus';
 
 interface ListHeaderProps {

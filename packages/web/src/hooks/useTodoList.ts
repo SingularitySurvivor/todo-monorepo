@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { todoListAPI } from '../utils/apiClient';
-import { TodoListWithPermissions, CreateTodoListRequest, UpdateTodoListRequest } from '../types/todoList';
-import { ApiError } from '../types/auth';
+import { TodoListWithPermissions, CreateTodoListRequest, UpdateTodoListRequest, ApiError } from '@todo-app/client-common';
 import { useSSE } from './useSSE';
 
 interface UseTodoListState {

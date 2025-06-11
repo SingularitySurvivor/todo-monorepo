@@ -24,7 +24,7 @@ import { useSSE } from '../../hooks/useSSE';
 import { TodoList, CreateTodoDialog, EditTodoDialog, TodoHeader } from '../../components/todos';
 import { MembersDialog } from '../../components/todo-lists';
 import ConnectionStatus from '../common/ConnectionStatus';
-import { Todo, TodoStatus, UpdateTodoRequest, TodoQueryParams, TodoFilters } from '../../types/todo';
+import { Todo, TodoStatus, UpdateTodoRequest, TodoQueryParams, TodoFilters } from '@todo-app/client-common';
 import { todoAPI } from '../../utils/apiClient';
 
 const TodoListDetailPage: React.FC = () => {

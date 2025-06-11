@@ -10,7 +10,7 @@ import {
   Stack,
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import { TodoListWithPermissions } from '../../types/todoList';
+import { TodoListWithPermissions } from '@todo-app/client-common';
 import ListCard from './ListCard';
 
 interface ListGridProps {
