@@ -25,6 +25,6 @@ export const env = {
   logLevel: process.env.LOG_LEVEL || 'info',
   
   // JWT Authentication
-  jwtSecret: process.env.JWT_SECRET || 'todo-app-secret-key-default',
+  jwtSecret: process.env.JWT_SECRET || 'todo-app-secret-key-default-abc',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '30d',
 };
