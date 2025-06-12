@@ -33,7 +33,7 @@ export interface UseSSEOptions {
 }
 
 /**
- * Consolidated SSE hook that handles all real-time events
+ * Simplified SSE hook that handles all real-time events
  */
 export const useSSE = (options: UseSSEOptions = {}) => {
   const {
@@ -127,7 +127,7 @@ export const useSSE = (options: UseSSEOptions = {}) => {
 
   const subscribe = useCallback(async () => {
     try {
-      await sseService.subscribeToUserEvents(handleSSEEvent);
+      await sseService.subscribe(handleSSEEvent);
     } catch (error) {
       console.error('Failed to subscribe to SSE:', error);
       handlersRef.current.onError?.(error);
@@ -135,11 +135,11 @@ export const useSSE = (options: UseSSEOptions = {}) => {
   }, [handleSSEEvent]);
 
   const unsubscribe = useCallback(() => {
-    sseService.unsubscribeFromUserEvents(handleSSEEvent);
+    sseService.unsubscribe(handleSSEEvent);
   }, [handleSSEEvent]);
 
   const getStatus = useCallback(() => {
-    return sseService.getUserGlobalConnectionStatus();
+    return sseService.getConnectionStatus();
   }, []);
 
   // Auto-subscribe when enabled
@@ -150,7 +150,7 @@ export const useSSE = (options: UseSSEOptions = {}) => {
 
     // Cleanup on unmount
     return () => {
-      sseService.unsubscribeFromUserEvents(handleSSEEvent);
+      sseService.unsubscribe(handleSSEEvent);
     };
   }, [autoSubscribe, subscribe, handleSSEEvent]);
 
@@ -158,7 +158,7 @@ export const useSSE = (options: UseSSEOptions = {}) => {
     subscribe,
     unsubscribe,
     getStatus,
-    isConnected: getStatus() === 'connected',
+    isConnected: sseService.isConnected(),
+    handlerCount: sseService.getHandlerCount(),
   };
 };
-
