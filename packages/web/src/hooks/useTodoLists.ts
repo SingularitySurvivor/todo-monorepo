@@ -16,6 +16,7 @@ interface UseTodoListsState {
 interface UseTodoListsReturn extends UseTodoListsState {
   refetch: () => Promise<void>;
   setFilters: (filters: ListQueryParams) => void;
+  getConnectionStatus: () => any;
 }
 
 export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsReturn => {
@@ -33,10 +34,11 @@ export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsRetur
   const currentUserId = user?.id;
 
   // Real-time event handlers
-  const handleListShared = useCallback(async (listId: string) => {
+  const handleListShared = useCallback(async (event: { listId: string; data: any }) => {
+    const { listId } = event;
     console.log('Real-time: User added to list, fetching list details:', listId);
     try {
-      // Fetch the full list details
+      // Always fetch the full list details to ensure we have complete and up-to-date information
       const response = await todoListAPI.getList(listId);
       const newList = response.data.list;
       
@@ -52,7 +54,8 @@ export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsRetur
     }
   }, []);
 
-  const handleListRemoved = useCallback((listId: string) => {
+  const handleListRemoved = useCallback((event: { listId: string; data: any }) => {
+    const { listId } = event;
     console.log('Real-time: User removed from list', listId);
     setState(prev => ({
       ...prev,
@@ -72,7 +75,7 @@ export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsRetur
   }, []);
 
   // Set up real-time subscription for global list events
-  useSSE({
+  const { getStatus } = useSSE({
     currentUserId,
     handlers: {
       onListShared: handleListShared,
@@ -121,5 +124,6 @@ export const useTodoLists = (initialParams?: ListQueryParams): UseTodoListsRetur
     ...state,
     refetch,
     setFilters,
+    getConnectionStatus: getStatus,
   };
 };

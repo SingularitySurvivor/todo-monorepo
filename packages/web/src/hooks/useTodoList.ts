@@ -14,6 +14,7 @@ interface UseTodoListReturn extends UseTodoListState {
   updateList: (data: UpdateTodoListRequest) => Promise<void>;
   deleteList: () => Promise<void>;
   archiveList: (isArchived: boolean) => Promise<void>;
+  getConnectionStatus: () => any;
 }
 
 export const useTodoList = (listId?: string): UseTodoListReturn => {
@@ -92,7 +93,7 @@ export const useTodoList = (listId?: string): UseTodoListReturn => {
   }, []);
 
   // Set up real-time subscription
-  useSSE({
+  const { getStatus } = useSSE({
     listId,
     handlers: {
       onListUpdated: handleListUpdated,
@@ -182,6 +183,7 @@ export const useTodoList = (listId?: string): UseTodoListReturn => {
     updateList,
     deleteList,
     archiveList,
+    getConnectionStatus: getStatus,
   };
 };
 

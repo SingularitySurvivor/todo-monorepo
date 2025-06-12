@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTodoLists } from '../../hooks';
-import { useSSE } from '../../hooks/useSSE';
 import { ListHeader, ListGrid, CreateListDialog, EditListDialog, MembersDialog } from '../../components/todo-lists';
 import { ListQueryParams, TodoListWithPermissions } from '@todo-app/client-common';
 import { todoListAPI } from '../../utils/apiClient';
@@ -16,20 +15,10 @@ const TodoListsPage: React.FC = () => {
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [selectedList, setSelectedList] = useState<TodoListWithPermissions | null>(null);
   
-  const { lists, loading, error, total, page, totalPages, refetch, setFilters } = useTodoLists(params);
+  const { lists, loading, error, total, page, totalPages, refetch, setFilters, getConnectionStatus } = useTodoLists(params);
   
-  // Use SSE connection for global list events
-  const { getStatus } = useSSE({
-    handlers: {
-      onListShared: () => refetch(), // When user is added to a list
-      onListRemoved: () => refetch(), // When user is removed from a list or list is deleted
-      onListUpdated: () => refetch(), // When list details change
-    },
-    autoSubscribe: true
-  });
-  
-  // Get real-time connection status
-  const connectionStatus = getStatus();
+  // Get real-time connection status from the hook
+  const connectionStatus = getConnectionStatus();
 
   // Update selectedList when lists data changes (e.g., after refetch from SSE)
   useEffect(() => {

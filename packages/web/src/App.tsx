@@ -9,7 +9,7 @@ import PublicRoute from './components/common/PublicRoute';
 import AppLayout from './components/layout/AppLayout';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
-import Dashboard from './components/layout/Dashboard';
+// import Dashboard from './components/layout/Dashboard';
 import TodoListsPage from './components/pages/TodoListsPage';
 import TodoListDetailPage from './components/pages/TodoListDetailPage';
 import GlobalTodosPage from './components/pages/GlobalTodosPage';

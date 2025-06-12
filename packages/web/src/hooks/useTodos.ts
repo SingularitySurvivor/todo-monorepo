@@ -15,6 +15,7 @@ interface UseTodosState {
 interface UseTodosReturn extends UseTodosState {
   refetch: () => Promise<void>;
   setFilters: (params: TodoQueryParams) => void;
+  getConnectionStatus?: () => any;
 }
 
 export const useTodos = (initialParams?: TodoQueryParams): UseTodosReturn => {
@@ -146,7 +147,7 @@ export const useListTodos = (listId?: string, initialParams?: TodoQueryParams): 
   }, []);
 
   // Set up real-time subscription
-  useSSE({
+  const { getStatus } = useSSE({
     listId,
     handlers: {
       onTodoCreated: handleTodoCreated,
@@ -174,6 +175,7 @@ export const useListTodos = (listId?: string, initialParams?: TodoQueryParams): 
     ...state,
     refetch,
     setFilters,
+    getConnectionStatus: getStatus,
   };
 };
 

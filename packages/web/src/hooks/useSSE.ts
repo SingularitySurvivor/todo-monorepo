@@ -10,9 +10,9 @@ export interface SSEEventHandlers {
   
   // List events
   onListUpdated?: (list: any) => void;
-  onListDeleted?: (listId: string) => void;
-  onListShared?: (listId: string) => void;
-  onListRemoved?: (listId: string) => void;
+  onListDeleted?: (event: { listId: string; data: any }) => void;
+  onListShared?: (event: { listId: string; data: any }) => void;
+  onListRemoved?: (event: { listId: string; data: any }) => void;
   
   // Member events
   onMemberAdded?: (member: any) => void;
@@ -79,18 +79,18 @@ export const useSSE = (options: UseSSEOptions = {}) => {
       case 'list:deleted':
         console.log('List deleted event received for listId:', event.listId);
         if (event.listId && event.listId !== 'global') {
-          currentHandlers.onListDeleted?.(event.listId);
-          currentHandlers.onListRemoved?.(event.listId);
+          currentHandlers.onListDeleted?.({ listId: event.listId, data: event.data });
+          currentHandlers.onListRemoved?.({ listId: event.listId, data: event.data });
         }
         break;
       
       // Member events
       case 'member:added':
         currentHandlers.onMemberAdded?.(event.data);
-        // When user is added to a list, trigger a fetch of that list
+        // When user is added to a list, pass the event data instead of just triggering refetch
         if (currentHandlers.onListShared && event.listId && event.listId !== 'global') {
-          console.log('User added to list, triggering refetch:', event.listId);
-          currentHandlers.onListShared(event.listId);
+          console.log('User added to list, passing event data:', event.listId);
+          currentHandlers.onListShared({ listId: event.listId, data: event.data });
         }
         break;
       case 'member:removed':
@@ -102,16 +102,16 @@ export const useSSE = (options: UseSSEOptions = {}) => {
             event.listId && 
             event.listId !== 'global' && 
             memberUserId === currentUserId) {
-          console.log('Current user removed from list, removing from UI:', event.listId);
-          currentHandlers.onListRemoved(event.listId);
+          console.log('Current user removed from list, passing event data:', event.listId);
+          currentHandlers.onListRemoved({ listId: event.listId, data: event.data });
         }
         break;
       case 'member:role_changed':
         currentHandlers.onMemberRoleChanged?.(event.data);
-        // When a member's role changes, trigger a list update to refresh permissions
+        // When a member's role changes, pass the event data instead of triggering refetch
         if (currentHandlers.onListShared && event.listId && event.listId !== 'global') {
-          console.log('Member role changed in list, triggering refetch:', event.listId);
-          currentHandlers.onListShared(event.listId);
+          console.log('Member role changed in list, passing event data:', event.listId);
+          currentHandlers.onListShared({ listId: event.listId, data: event.data });
         }
         break;
       

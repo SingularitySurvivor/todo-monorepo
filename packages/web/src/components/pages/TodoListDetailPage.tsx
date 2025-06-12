@@ -20,7 +20,6 @@ import {
 } from '@mui/icons-material';
 import { useTodoList } from '../../hooks';
 import { useListTodos } from '../../hooks/useTodos';
-import { useSSE } from '../../hooks/useSSE';
 import { TodoList, CreateTodoDialog, EditTodoDialog, TodoHeader } from '../../components/todos';
 import { MembersDialog } from '../../components/todo-lists';
 import ConnectionStatus from '../common/ConnectionStatus';
@@ -35,8 +34,8 @@ const TodoListDetailPage: React.FC = () => {
     sortOrder: 'desc'
   });
 
-  const { list, loading: listLoading, error: listError, refetch: refetchList } = useTodoList(listId);
-  const { todos, loading: todosLoading, error: todosError, refetch: refetchTodos, setFilters } = useListTodos(listId, todoParams);
+  const { list, loading: listLoading, error: listError, refetch: refetchList, getConnectionStatus: getListConnectionStatus } = useTodoList(listId);
+  const { todos, loading: todosLoading, error: todosError, refetch: refetchTodos, setFilters, getConnectionStatus: getTodosConnectionStatus } = useListTodos(listId, todoParams);
   
   const [createTodoOpen, setCreateTodoOpen] = useState(false);
   const [editTodoOpen, setEditTodoOpen] = useState(false);
@@ -44,23 +43,8 @@ const TodoListDetailPage: React.FC = () => {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   
-  // Use SSE connection with event filtering for this specific list
-  const { getStatus } = useSSE({
-    listId,
-    handlers: {
-      onTodoCreated: () => refetchTodos(),
-      onTodoUpdated: () => refetchTodos(),
-      onTodoDeleted: () => refetchTodos(),
-      onListUpdated: () => refetchList(),
-      onMemberAdded: () => refetchList(),
-      onMemberRemoved: () => refetchList(),
-      onMemberRoleChanged: () => refetchList(),
-    },
-    autoSubscribe: true
-  });
-  
-  // Get connection status
-  const connectionStatus = getStatus();
+  // Get connection status from either hook (they should be the same)
+  const connectionStatus = getListConnectionStatus();
 
   if (!listId) {
     return (
