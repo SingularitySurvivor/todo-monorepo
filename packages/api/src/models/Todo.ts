@@ -66,13 +66,9 @@ const todoSchema = new Schema<ITodo>(
 );
 
 // Indexes for efficient querying
-todoSchema.index({ listId: 1, status: 1 });
-todoSchema.index({ listId: 1, dueDate: 1 });
-todoSchema.index({ listId: 1, priority: 1 });
-todoSchema.index({ listId: 1, tags: 1 });
+todoSchema.index({ listId: 1, status: 1, priority: 1, dueDate: 1 });
 todoSchema.index({ listId: 1, createdAt: -1 });
-todoSchema.index({ userId: 1, status: 1 });
-todoSchema.index({ userId: 1, createdAt: -1 });
+todoSchema.index({ userId: 1, status: 1, createdAt: -1 });
 
 const Todo = mongoose.model<ITodo>('Todo', todoSchema);
 
