@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Box,
@@ -8,7 +8,6 @@ import {
   Alert,
 } from '@mui/material';
 import { useTodos } from '../../hooks/useTodos';
-import { useSSE } from '../../hooks/useSSE';
 import { TodoList, TodoHeader } from '../../components/todos';
 import ConnectionStatus from '../common/ConnectionStatus';
 import { TodoQueryParams, TodoFilters } from '@todo-app/client-common';
@@ -21,34 +20,10 @@ const GlobalTodosPage: React.FC = () => {
     limit: 50, // Show more todos for global view
   });
 
-  const { todos, loading, error, total, refetch, setFilters } = useTodos(todoParams);
+  const { todos, loading, error, total, refetch, setFilters, getConnectionStatus } = useTodos(todoParams);
 
-  // Real-time event handling
-  const handleTodoCreated = useCallback(() => {
-    console.log('Todo created, refreshing global todos...');
-    refetch();
-  }, [refetch]);
-
-  const handleTodoUpdated = useCallback(() => {
-    console.log('Todo updated, refreshing global todos...');
-    refetch();
-  }, [refetch]);
-
-  const handleTodoDeleted = useCallback(() => {
-    console.log('Todo deleted, refreshing global todos...');
-    refetch();
-  }, [refetch]);
-
-  // Use the consolidated SSE hook
-  const { getStatus } = useSSE({
-    handlers: {
-      onTodoCreated: handleTodoCreated,
-      onTodoUpdated: handleTodoUpdated,
-      onTodoDeleted: handleTodoDeleted,
-    },
-    autoSubscribe: true
-  });
-  const connectionStatus = getStatus();
+  // Get connection status from the hook
+  const connectionStatus = getConnectionStatus();
 
   const handleFiltersChange = (filters: TodoFilters) => {
     const newParams = { ...todoParams, filters, page: 1 }; // Reset to page 1 when filtering
