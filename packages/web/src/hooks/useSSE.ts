@@ -33,7 +33,7 @@ export interface UseSSEOptions {
 }
 
 /**
- * Simplified SSE hook that handles all real-time events
+ * Simplified SSE hook that works with persistent connections
  */
 export const useSSE = (options: UseSSEOptions = {}) => {
   const {
@@ -44,19 +44,32 @@ export const useSSE = (options: UseSSEOptions = {}) => {
   } = options;
   
   const handlersRef = useRef<SSEEventHandlers>(handlers);
+  const listIdRef = useRef(listId);
+  const currentUserIdRef = useRef(currentUserId);
   
-  // Update ref when handlers change
+  // Update refs when values change (but don't recreate callbacks)
   useEffect(() => {
     handlersRef.current = handlers;
   }, [handlers]);
+  
+  useEffect(() => {
+    listIdRef.current = listId;
+  }, [listId]);
+  
+  useEffect(() => {
+    currentUserIdRef.current = currentUserId;
+  }, [currentUserId]);
 
-  const handleSSEEvent = useCallback((event: SSEEvent) => {
+  // Create stable event handler that doesn't change
+  const stableEventHandler = useCallback((event: SSEEvent) => {
     console.log('Received SSE event:', event);
     
     const currentHandlers = handlersRef.current;
+    const currentListId = listIdRef.current;
+    const currentCurrentUserId = currentUserIdRef.current;
     
     // Filter events by listId if specified (only process events for this specific list)
-    if (listId && event.listId && event.listId !== listId && event.listId !== 'global') {
+    if (currentListId && event.listId && event.listId !== currentListId && event.listId !== 'global') {
       return; // Ignore events for other lists
     }
     
@@ -101,7 +114,7 @@ export const useSSE = (options: UseSSEOptions = {}) => {
         if (currentHandlers.onListRemoved && 
             event.listId && 
             event.listId !== 'global' && 
-            memberUserId === currentUserId) {
+            memberUserId === currentCurrentUserId) {
           console.log('Current user removed from list, passing event data:', event.listId);
           currentHandlers.onListRemoved({ listId: event.listId, data: event.data });
         }
@@ -123,41 +136,48 @@ export const useSSE = (options: UseSSEOptions = {}) => {
       default:
         console.log('Unhandled SSE event type:', event.type);
     }
-  }, [listId, currentUserId]);
+  }, []); // Empty dependency array - this callback never changes
 
   const subscribe = useCallback(async () => {
     try {
-      await sseService.subscribe(handleSSEEvent);
+      await sseService.subscribe(stableEventHandler);
     } catch (error) {
       console.error('Failed to subscribe to SSE:', error);
       handlersRef.current.onError?.(error);
     }
-  }, [handleSSEEvent]);
+  }, [stableEventHandler]);
 
   const unsubscribe = useCallback(() => {
-    sseService.unsubscribe(handleSSEEvent);
-  }, [handleSSEEvent]);
+    sseService.unsubscribe(stableEventHandler);
+  }, [stableEventHandler]);
 
   const getStatus = useCallback(() => {
     return sseService.getConnectionStatus();
   }, []);
 
-  // Auto-subscribe when enabled
+  const getDebugInfo = useCallback(() => {
+    return sseService.getDebugInfo();
+  }, []);
+
+  // Subscribe when component mounts (if autoSubscribe is enabled)
+  // Connection stays persistent, so this just adds our handler
   useEffect(() => {
     if (autoSubscribe) {
       subscribe();
     }
 
-    // Cleanup on unmount
+    // Cleanup: remove our handler when component unmounts
+    // (but connection stays alive for other components)
     return () => {
-      sseService.unsubscribe(handleSSEEvent);
+      sseService.unsubscribe(stableEventHandler);
     };
-  }, [autoSubscribe, subscribe, handleSSEEvent]);
+  }, [autoSubscribe, subscribe, stableEventHandler]);
 
   return {
     subscribe,
     unsubscribe,
     getStatus,
+    getDebugInfo,
     isConnected: sseService.isConnected(),
     handlerCount: sseService.getHandlerCount(),
   };
