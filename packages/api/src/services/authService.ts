@@ -5,6 +5,7 @@ import { User } from '../models';
 import { ApiError, UserTransformer, MongoValidator } from '../utils';
 import { config } from '../config';
 import { IUser, IUserSafe, UserRegisterDto, UserLoginDto, AuthTokenPayload } from '../types';
+import type { StringValue } from 'ms';
 
 /**
  * Generate JWT token
@@ -16,7 +17,11 @@ const generateToken = (id: string, email: string, role: string): string => {
     role,
   };
 
-  return jwt.sign(payload, config.jwt.secret as string, { expiresIn: '1h' });
+  return jwt.sign(
+    payload,
+    config.jwt.secret!,
+    { expiresIn: config.jwt.expiresIn as StringValue }
+  );
 };
 
 /**

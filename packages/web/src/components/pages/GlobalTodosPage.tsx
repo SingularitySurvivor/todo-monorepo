@@ -63,6 +63,26 @@ const GlobalTodosPage: React.FC = () => {
     setEditTodoOpen(true);
   };
 
+  const handleEditTodo = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setEditTodoOpen(true);
+  };
+
+  const handleDeleteTodo = async (todo: Todo) => {
+    if (window.confirm(`Are you sure you want to delete "${todo.name}"?`)) {
+      try {
+        setUpdateLoading(true);
+        await todoAPI.deleteTodo(todo.id);
+        refetch();
+      } catch (error) {
+        console.error('Failed to delete todo:', error);
+        alert('Failed to delete todo. Please try again.');
+      } finally {
+        setUpdateLoading(false);
+      }
+    }
+  };
+
   const handleSaveEdit = async (todoId: string, updates: UpdateTodoRequest) => {
     setUpdateLoading(true);
     try {
@@ -139,8 +159,8 @@ const GlobalTodosPage: React.FC = () => {
             error={error}
             onTodoClick={handleTodoClick}
             onToggleComplete={undefined} // Read-only view for now
-            onEditTodo={undefined}
-            onDeleteTodo={undefined}
+            onEditTodo={handleEditTodo}
+            onDeleteTodo={handleDeleteTodo}
             onCreateTodo={undefined}
             emptyStateTitle="No todos found"
             emptyStateMessage="You don't have any todos yet. Create some todos in your lists to see them here."
