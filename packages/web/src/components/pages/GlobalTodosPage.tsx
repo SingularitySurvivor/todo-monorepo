@@ -8,9 +8,10 @@ import {
   Alert,
 } from '@mui/material';
 import { useTodos } from '../../hooks/useTodos';
-import { TodoList, TodoHeader } from '../../components/todos';
+import { TodoList, TodoHeader, EditTodoDialog } from '../../components/todos';
 import ConnectionStatus from '../common/ConnectionStatus';
-import { TodoQueryParams, TodoFilters } from '@todo-app/client-common';
+import { TodoQueryParams, TodoFilters, Todo, UpdateTodoRequest } from '@todo-app/client-common';
+import { todoAPI } from '../../utils/apiClient';
 
 const GlobalTodosPage: React.FC = () => {
   const [todoParams, setTodoParams] = useState<TodoQueryParams>({
@@ -19,6 +20,10 @@ const GlobalTodosPage: React.FC = () => {
     page: 1,
     limit: 50, // Show more todos for global view
   });
+
+  const [editTodoOpen, setEditTodoOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   const { todos, loading, error, total, refetch, setFilters, getConnectionStatus } = useTodos(todoParams);
 
@@ -53,10 +58,22 @@ const GlobalTodosPage: React.FC = () => {
     setFilters(newParams);
   };
 
-  const handleTodoClick = (todo: any) => {
-    // For global todos, we could navigate to the specific list
-    // or open an edit dialog - implementing simple console log for now
-    console.log('Todo clicked:', todo);
+  const handleTodoClick = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setEditTodoOpen(true);
+  };
+
+  const handleSaveEdit = async (todoId: string, updates: UpdateTodoRequest) => {
+    setUpdateLoading(true);
+    try {
+      await todoAPI.updateTodo(todoId, updates);
+      refetch();
+    } catch (error) {
+      console.error('Failed to update todo:', error);
+      throw error; // Re-throw to show error in dialog
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   return (
@@ -134,6 +151,18 @@ const GlobalTodosPage: React.FC = () => {
           />
         </CardContent>
       </Card>
+
+      {/* Edit Todo Dialog */}
+      <EditTodoDialog
+        open={editTodoOpen}
+        todo={selectedTodo}
+        onClose={() => {
+          setEditTodoOpen(false);
+          setSelectedTodo(null);
+        }}
+        onSave={handleSaveEdit}
+        loading={updateLoading}
+      />
     </Container>
   );
 };
