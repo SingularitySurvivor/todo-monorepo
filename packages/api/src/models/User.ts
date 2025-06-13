@@ -95,9 +95,6 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
   }
 };
 
-// Indexes for efficient querying
-userSchema.index({ email: 1 });
-
 const User = mongoose.model<IUser>('User', userSchema);
 
 export default User;

@@ -206,21 +206,6 @@ const TodoRow: React.FC<TodoRowProps> = ({
             {todo.name}
           </Typography>
           
-          {/* List Name */}
-          {showListName && todo.listName && (
-            <Chip
-              label={todo.listName}
-              size="small"
-              variant="outlined"
-              color="primary"
-              sx={{ 
-                fontSize: '0.65rem', 
-                height: 18,
-                '& .MuiChip-label': { px: 0.5 }
-              }}
-            />
-          )}
-          
           {/* Tags */}
           {(todo.tags?.length || 0) > 0 && (
             <Stack direction="row" spacing={0.5}>
@@ -270,6 +255,22 @@ const TodoRow: React.FC<TodoRowProps> = ({
           </Typography>
         )}
       </Box>
+
+      {/* List Name */}
+      {showListName && todo.listName && (
+        <Chip
+          label={todo.listName}
+          size="small"
+          variant="outlined"
+          color="primary"
+          sx={{ 
+            fontSize: '0.7rem', 
+            height: 24,
+            mr: 1,
+            '& .MuiChip-label': { px: 0.5 }
+          }}
+        />
+      )}
 
       {/* Status Chip */}
       <Chip
